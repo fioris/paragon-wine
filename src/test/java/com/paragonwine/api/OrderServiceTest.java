@@ -18,7 +18,10 @@ import com.paragonwine.service.VeryFastQuoteCacheConfiguration;
 import com.paragonwine.service.QuoteSystem;
 import com.paragonwine.service.WarehouseSystem;
 import com.paragonwine.web.UserBean;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -44,6 +47,9 @@ public class OrderServiceTest {
 
     @Inject
     OrderService orderService;
+    
+    @Inject
+    FulfillmentService fulfillmentService;
     
     @Inject
     UserBean userBean;
@@ -88,6 +94,35 @@ public class OrderServiceTest {
         Thread.sleep(2000);
         
         assertThat(orderService.confirmOrder(userBean.getUserAuthToken(), offers.get(0)), is(true));
+    }
+
+    /**
+     * Test of confirmOrder method, of class OrderService.
+     */
+    @Test
+    public void testCreatFastOrder() throws InterruptedException, FulfillmentException {
+        userBean.setUserAuthToken("test@me.com");
+        List<Offer> offers = orderService.searchForProduct("Cabernet Sauvignon");
+        
+        Thread.sleep(2000);
+        
+        Order order = fulfillmentService.createOrder(userBean.getUserAuthToken(), offers.get(0));
+        assertThat(order.getTotalPrice(), closeTo(BigDecimal.TEN, BigDecimal.ZERO));
+    }
+
+    /**
+     * Test of confirmOrder method, of class OrderService.
+     */
+    @Test
+    public void testCreatSlowOrder() throws InterruptedException, FulfillmentException {
+        userBean.setUserAuthToken("test@me.com");
+        List<Offer> offers = orderService.searchForProduct("Cabernet Sauvignon");
+        
+        Thread.sleep(4000);
+        
+        Order order = fulfillmentService.createOrder(userBean.getUserAuthToken(), offers.get(0));
+        Logger.getLogger(OrderServiceTest.class.getName()).log(Level.INFO, "{0}", order);
+        assertThat(order.getTotalPrice(), closeTo(new BigDecimal("10.50"), BigDecimal.ZERO));
     }
     
     /**

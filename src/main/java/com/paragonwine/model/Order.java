@@ -56,5 +56,10 @@ public class Order {
     public void setUserAuthtoken(String userAuthtoken) {
         this.userAuthtoken = userAuthtoken;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" + "id=" + id + ", timestamp=" + timestamp + ", totalPrice=" + totalPrice + ", userAuthtoken=" + userAuthtoken + '}';
+    }
     
 }

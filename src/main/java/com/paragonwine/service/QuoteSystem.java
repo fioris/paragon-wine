@@ -28,7 +28,9 @@ import org.joda.time.Duration;
 public class QuoteSystem implements QuoteStore {
 
     // these values should be dynamicly fetched from the app server (JNDI)
-    public static final BigDecimal STANDARD_PROCESSING_CHARGE = new BigDecimal(5);
+    public static final BigDecimal SUPERFAST_PROCESSING_CHARGE = BigDecimal.ZERO;
+    public static final BigDecimal FAST_PROCESSING_CHARGE = new BigDecimal(10);
+    public static final BigDecimal STANDARD_PROCESSING_CHARGE = new BigDecimal(20);
     public static final BigDecimal CASE_SIZE = new BigDecimal(12);
     
     @Inject
@@ -64,11 +66,11 @@ public class QuoteSystem implements QuoteStore {
          * insert some business logic to get the correct processing-charge
          */
         long millis = new Duration(quote.getCreateDate(), new DateTime()).getMillis();
-        if (millis < (2 * 60 *1000)) {
-            quote.setProcessingCharge(BigDecimal.ZERO);
+        if (millis < (3 * 1000)) {
+            quote.setProcessingCharge(SUPERFAST_PROCESSING_CHARGE);
         } else {
-            BigDecimal standardPrice = quote.getOffer().getPrice().multiply(CASE_SIZE);
-            quote.setProcessingCharge(standardPrice.min(BigDecimal.TEN));
+            BigDecimal standardCharge = quote.getOffer().getPrice().multiply(new BigDecimal("0.05"));
+            quote.setProcessingCharge(standardCharge.min(FAST_PROCESSING_CHARGE));
         }
         
         return quote;

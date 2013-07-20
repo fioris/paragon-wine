@@ -21,6 +21,7 @@ public class Quote {
 
     public Quote(Offer offer) {
         this.offer = offer;
+        this.totalPrice = offer.getPrice();
     }
 
     public UUID getId() {
@@ -49,6 +50,7 @@ public class Quote {
 
     public void setProcessingCharge(BigDecimal processingCharge) {
         this.processingCharge = processingCharge;
+        this.totalPrice = totalPrice.add(processingCharge);
     }
 
 }
